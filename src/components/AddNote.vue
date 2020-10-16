@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="add-note container">
+    <div class="add-note">
       <form @submit.prevent="AddNote">
         <div class="field title">
           <input class="title-input" type="text" placeholder="Title" name="title" v-model="title">
