@@ -1,13 +1,12 @@
 <template>
   <div class="navbar">
-    <div class="left-navbar">
+    <div class="left-navbar"></div>
+    <div class="mid-navbar">
       <router-link :to="{ name: 'Index' }">
-        <img src="@/assets/keep_48dp.png" alt="google-keep-logo">
-        <span>Keep</span>
+        <img src="@/assets/notes-logo.png" alt="notes-logo">
       </router-link>
     </div>
-    <div class="mid-navbar">Search box</div>
-    <div class="right-navbar">Profile picture</div>
+    <div class="right-navbar"></div>
   </div>
 </template>
 
@@ -25,20 +24,13 @@ export default {
   display: flex;
   justify-content: space-between;
   text-align: center;
-  height: 48px;
-  .left-navbar {
+  height: 70px;
+  padding: 5px 0;
+  .mid-navbar {
     display: flex;
     align-items: center;
-    span {
-      font-family: 'Noto Sans JP', sans-serif;
-      font-size: 22px;
-      color: #5f6368;
-      margin-left: 8px;
-      text-decoration: none;
-    }
     img {
-      width: 40px;
-      height: 40px;
+      height: 60px;
     }
     a {
       text-decoration: none;

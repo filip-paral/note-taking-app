@@ -1,5 +1,11 @@
 <template>
   <div class="container">
+    <div class="search-wrapper">
+      <div class="search-box">
+        <i class="fas search-icon fa-search"></i>
+        <input type="text" v-model="search" placeholder="Search">
+      </div>
+    </div>
 <!-- Add Modal -->
     <button type="button" class="add-btn" @click="showModal = true"><i class="fas plus-icon fa-3x fa-plus"></i></button>
     <transition name="fade" appear>
@@ -7,7 +13,7 @@
     </transition>
     <transition name="pop">
       <div class="modal" v-if="showModal">
-          <form @submit.prevent="AddNote">
+          <form @submit.prevent="addNote">
             <div class="field title">
               <input class="title-input" type="text" placeholder="Title" name="title" v-model="title">
               <p v-if="feedback" class="red-txt">{{ feedback }}</p>
@@ -27,7 +33,7 @@
     </transition>
     <transition name="pop">
       <div class="modal" v-if="showEdit">
-        <form @submit.prevent="EditNote">
+        <form @submit.prevent="editNote">
           <div class="field title">
             <input class="title-input" type="text" placeholder="Title" name="title" v-model="note.title">
             <p v-if="feedback" class="red-txt">{{ feedback }}</p>
@@ -43,17 +49,17 @@
     </transition>
 <!-- Card section-->
     <div class="card-section">
-      <div class="note-card" v-for="item in notes" :key="item.id" v-bind:style="{ backgroundColor: item.bg }">
+      <div class="note-card" v-for="item in filteredList" :key="item.id" v-bind:style="{ backgroundColor: item.bg }">
         <h2 >{{ item.title }}</h2>
         <p class="card-txt" v-if="item.text.length > 300 ">{{ item.text.substring(0, 300)+'...' }}</p>
         <p class="card-txt" v-if="item.text.length < 300">{{ item.text }}</p>
         <div class="edit-bar">
           <i class="fas fa-1x fa-trash-alt edit-icon" @click="deleteNote(item.id)"></i>
-          <i class="fas fa-1x fa-edit edit-icon" @click="GrabData(item.title)" ></i>
+          <i class="fas fa-1x fa-edit edit-icon" @click="grabData(item.title)" ></i>
           <div><i class="fas fa-1x fa-palette edit-icon color-icon" @click="showColorBar()"></i></div>
           <transition name="fade" appear>
             <div class="color-picker" @mouseleave="showColorBar()" v-if="showColors">
-              <i class="fas fa-2x white-ico fa-circle" @click="changeColor('#ffffff', item.id)"></i>
+              <i class="fas fa-2x white-ico fa-circle" @click="changeColor('#f8f8f8', item.id)"></i>
               <i class="fas fa-2x red-ico fa-circle" @click="changeColor('#f28b82', item.id)"></i>
               <i class="fas fa-2x yellow-ico fa-circle" @click="changeColor('#fff475', item.id)"></i>
               <i class="fas fa-2x cyan-ico fa-circle" @click="changeColor('#a7ffeb', item.id)"></i>
@@ -83,6 +89,7 @@ export default {
       text: null,
       feedback: null,
       slug: null,
+      search: ''
     };
   },
   methods: {
@@ -96,22 +103,14 @@ export default {
     changeColor(color, id) {
       db.collection('notes').doc(id).update({
         bg: color
-      }).catch(err => {
-        console.log(err)
+      }).catch(err => {console.log(err)
       })
-      // re-read data from firestore
-      this.notes = []
-      db.collection("notes")
-          .get()
-          .then((snapshot) => {
-            snapshot.forEach((doc) => {
-              let note = doc.data()
-              note.id = doc.id
-              this.notes.push(note)
-            });
-          }).catch(err => {
-        console.log(err)
-      });
+      // update notes array
+      this.notes.forEach((record) => {
+        if (record.id == id) {
+          record.bg = color
+        }
+      })
     },
     deleteNote(id) {
       // delete doc from firestore
@@ -122,9 +121,9 @@ export default {
         })
       })
     },
-    AddNote() {
+    addNote() {
       // title check
-      if (this.title) {
+      if (this.title && this.text) {
         this.feedback = null
         this.slug = slugify(this.title, {
           replacement: '-',
@@ -134,8 +133,9 @@ export default {
         db.collection('notes').add({
           title: this.title,
           text: this.text,
-          slug: this.slug
-          bg: '#ffffff'
+          slug: this.slug,
+          bg: '#f8f8f8',
+          dateCreated: Date()
         }).catch(err => {console.log(err)})
         this.note
         // re-read data from firestore
@@ -143,27 +143,20 @@ export default {
           title: this.title,
           text: this.text,
           slug: this.slug,
-          bg: '#ffffff'
+          bg: '#f8f8f8'
         }
-        this.notes.push(this.note)
-        // db.collection("notes")
-        //     .get()
-        //     .then((snapshot) => {
-        //       snapshot.forEach((doc) => {
-        //         let note = doc.data()
-        //         note.id = doc.id
-        //         this.notes.push(note)
-        //       });
-        //     });
+        this.notes.unshift(this.note)
         this.showModal = false
         this.title = null
         this.text = null
         this.slug = null
+      } else if (this.title && !(this.text)) {
+        this.feedback = 'You must enter some text.'
       } else {
         this.feedback = 'You must enter a title.'
       }
     },
-    GrabData(title) {
+    grabData(title) {
       let ref = db.collection('notes').where('title', '==', title)
       ref.get().then(snapshot => {
         snapshot.forEach(doc => {
@@ -173,8 +166,8 @@ export default {
         })
       })
     },
-    EditNote() {
-      if (this.note.title) {
+    editNote() {
+      if (this.note.title && this.note.text) {
         this.feedback = null
         this.note.slug = slugify(this.note.title, {
           replacement: '-',
@@ -186,49 +179,39 @@ export default {
           text: this.note.text,
           slug: this.note.slug
         }).catch(err => {console.log(err)})
-        // re-read data from firestore
-        this.note = {
-          title: this.title,
-          text: this.text,
-          slug: this.slug,
-          bg: '#ffffff'
-        }
-        // this.notes = []
-        // db.collection("notes")
-        //     .get()
-        //     .then((snapshot) => {
-        //       snapshot.forEach((doc) => {
-        //         let note = doc.data()
-        //         note.id = doc.id
-        //         this.notes.push(note)
-        //       });
-        //     }).catch(err => {
-        //     console.log(err)
-        // });
+        // edit notes array
+        this.notes.forEach((record) => {
+          if (record.id == this.note.id) {
+            record.title = this.note.title
+            record.text = this.note.text
+            record.slug = this.note.slug
+          }
+        })
         this.showEdit = false
-        this.title = null
-        this.text = null
-        this.slug = null
-        this.note = null
+      } else if (this.note.title && !(this.note.text)) {
+        this.feedback = 'You must enter some text.'
       } else {
-        this.feedback = 'You must enter a title!'
+        this.feedback = 'You must enter a title.'
       }
     }
   },
-  // computed {
-  //   filteredList() {
-  //     return.this
-  //   }
-  // },
+  computed: {
+    filteredList() {
+      return this.notes.filter(item => {
+        return item.title.toLowerCase().includes(this.search.toLowerCase())
+      })
+    }
+  },
   created() {
     // get data from firestore
-    db.collection("notes").get()
+    db.collection("notes").orderBy("dateCreated").get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
           let note = doc.data()
           note.id = doc.id
           this.notes.push(note)
         });
+        this.notes.reverse()
       });
   },
 };
@@ -242,12 +225,41 @@ export default {
   overflow-x: hidden;
 }
 
+// SEARCH BAR
+.search-wrapper {
+  display: flex;
+  position: relative;
+  margin: 1rem auto;
+  justify-content: center;
+  .search-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f1f3f4;
+    height: 45px;
+    border-radius: 20px;
+    padding: 12px;
+    input {
+      border: 1px solid #5f6368;
+      width: 33vw;
+      font-size: 1.2rem;
+      background-color: #f1f3f4;
+      border: none;
+    }
+    .search-icon {
+      margin-right: 20px;
+      margin-left: 10px;
+      color: #707071;
+    }
+  }
+}
+
 // MODAL
 .add-btn {
   border-radius: 100%;
   border: none;
   text-decoration: none;
-  background-color: #f1b005;
+  background-color: #ff6600;
   width: 70px;
   height: 70px;
   position: fixed;
@@ -315,7 +327,7 @@ export default {
   gap: 12px;
   margin: 2vw 3vw;
   .note-card {
-    background-color: #e8eaed;
+    background-color: #f8f8f8;
     padding: 5% 5% 15% 5%;
     border-radius: 6px;
     position: relative;
@@ -452,6 +464,6 @@ input {
 
 .field {
   position: relative;
-  background: #fff;
+  background: #ffffff;
 }
 </style>
