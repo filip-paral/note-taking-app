@@ -3,43 +3,42 @@
     <div class="search-wrapper">
       <div class="search-box">
         <i class="fas search-icon fa-search"></i>
-        <input type="text" v-model="search" placeholder="Search">
+        <input type="text" v-model="search" placeholder="Search" />
       </div>
     </div>
-<!-- Add Modal -->
-    <button type="button" class="add-btn" @click="showModal = true"><i class="fas plus-icon fa-3x fa-plus"></i></button>
+    <!-- Add Modal -->
+    <button type="button" class="add-btn" @click="showModal = true">
+      <i class="fas plus-icon fa-3x fa-plus"></i>
+    </button>
     <transition name="fade" appear>
-      <div class="modal-overlay" v-if="showModal" @click="showModal = false"></div>
+      <div
+        class="modal-overlay"
+        v-if="showModal"
+        @click="showModal = false"
+      ></div>
     </transition>
     <transition name="pop">
       <div class="modal" v-if="showModal">
-          <form @submit.prevent="addNote">
-            <div class="field title">
-              <input class="title-input" type="text" placeholder="Title" name="title" v-model="title">
-              <p v-if="feedback" class="red-txt">{{ feedback }}</p>
-            </div>
-            <div class="field add-note-txt">
-              <textarea v-model="text" class="text-input" name="text-entry" placeholder="Create a note..." cols="10" rows="10"></textarea>
-            </div>
-            <div class="field">
-              <button class="submit-btn">Save</button>
-            </div>
-          </form>
-      </div>
-    </transition>
-<!-- Edit Modal -->
-    <transition name="fade" appear>
-      <div class="modal-overlay" v-if="showEdit" @click="showEdit = false"></div>
-    </transition>
-    <transition name="pop">
-      <div class="modal" v-if="showEdit">
-        <form @submit.prevent="editNote">
+        <form @submit.prevent="addNote">
           <div class="field title">
-            <input class="title-input" type="text" placeholder="Title" name="title" v-model="note.title">
+            <input
+              class="title-input"
+              type="text"
+              placeholder="Title"
+              name="title"
+              v-model="title"
+            />
             <p v-if="feedback" class="red-txt">{{ feedback }}</p>
           </div>
           <div class="field add-note-txt">
-            <textarea v-model="note.text" class="text-input" name="text-entry" placeholder="Create a note..." cols="10" rows="10"></textarea>
+            <textarea
+              v-model="text"
+              class="text-input"
+              name="text-entry"
+              placeholder="Create a note..."
+              cols="10"
+              rows="10"
+            ></textarea>
           </div>
           <div class="field">
             <button class="submit-btn">Save</button>
@@ -47,24 +46,101 @@
         </form>
       </div>
     </transition>
-<!-- Card section-->
+    <!-- Edit Modal -->
+    <transition name="fade" appear>
+      <div
+        class="modal-overlay"
+        v-if="showEdit"
+        @click="showEdit = false"
+      ></div>
+    </transition>
+    <transition name="pop">
+      <div class="modal" v-if="showEdit">
+        <form @submit.prevent="editNote">
+          <div class="field title">
+            <input
+              class="title-input"
+              type="text"
+              placeholder="Title"
+              name="title"
+              v-model="note.title"
+            />
+            <p v-if="feedback" class="red-txt">{{ feedback }}</p>
+          </div>
+          <div class="field add-note-txt">
+            <textarea
+              v-model="note.text"
+              class="text-input"
+              name="text-entry"
+              placeholder="Create a note..."
+              cols="10"
+              rows="10"
+            ></textarea>
+          </div>
+          <div class="field">
+            <button class="submit-btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </transition>
+    <!-- Card section-->
     <div class="card-section">
-      <div class="note-card" v-for="item in filteredList" :key="item.id" v-bind:style="{ backgroundColor: item.bg }">
-        <h2 >{{ item.title }}</h2>
-        <p class="card-txt" v-if="item.text.length > 300 ">{{ item.text.substring(0, 300)+'...' }}</p>
+      <div
+        class="note-card"
+        v-for="item in filteredList"
+        :key="item.id"
+        v-bind:style="{ backgroundColor: item.bg }"
+      >
+        <h2>{{ item.title }}</h2>
+        <p class="card-txt" v-if="item.text.length > 300">
+          {{ item.text.substring(0, 300) + "..." }}
+        </p>
         <p class="card-txt" v-if="item.text.length < 300">{{ item.text }}</p>
         <div class="edit-bar">
-          <i class="fas fa-1x fa-trash-alt edit-icon" @click="deleteNote(item.id)"></i>
-          <i class="fas fa-1x fa-edit edit-icon" @click="grabData(item.title)" ></i>
-          <div><i class="fas fa-1x fa-palette edit-icon color-icon" @click="showColorBar()"></i></div>
+          <i
+            class="fas fa-1x fa-trash-alt edit-icon"
+            @click="deleteNote(item.id)"
+          ></i>
+          <i
+            class="fas fa-1x fa-edit edit-icon"
+            @click="grabData(item.title)"
+          ></i>
+          <div>
+            <i
+              class="fas fa-1x fa-palette edit-icon color-icon"
+              @click="showColorBar()"
+            ></i>
+          </div>
           <transition name="fade" appear>
-            <div class="color-picker" @mouseleave="showColorBar()" v-if="showColors">
-              <i class="fas fa-2x white-ico fa-circle" @click="changeColor('#f8f8f8', item.id)"></i>
-              <i class="fas fa-2x red-ico fa-circle" @click="changeColor('#f28b82', item.id)"></i>
-              <i class="fas fa-2x yellow-ico fa-circle" @click="changeColor('#fff475', item.id)"></i>
-              <i class="fas fa-2x cyan-ico fa-circle" @click="changeColor('#a7ffeb', item.id)"></i>
-              <i class="fas fa-2x blue-ico fa-circle" @click="changeColor('#aecbfa', item.id)"></i>
-              <i class="fas fa-2x pink-ico fa-circle" @click="changeColor('#fdcfe8', item.id)"></i>
+            <div
+              class="color-picker"
+              @mouseleave="showColorBar()"
+              v-if="showColors"
+            >
+              <i
+                class="fas fa-2x white-ico fa-circle"
+                @click="changeColor('#f8f8f8', item.id)"
+              ></i>
+              <i
+                class="fas fa-2x red-ico fa-circle"
+                @click="changeColor('#f28b82', item.id)"
+              ></i>
+              <i
+                class="fas fa-2x yellow-ico fa-circle"
+                @click="changeColor('#fff475', item.id)"
+              ></i>
+              <i
+                class="fas fa-2x cyan-ico fa-circle"
+                @click="changeColor('#a7ffeb', item.id)"
+              ></i>
+              <i
+                class="fas fa-2x blue-ico fa-circle"
+                @click="changeColor('#aecbfa', item.id)"
+              ></i>
+              <i
+                class="fas fa-2x pink-ico fa-circle"
+                @click="changeColor('#fdcfe8', item.id)"
+              ></i>
             </div>
           </transition>
         </div>
@@ -76,6 +152,8 @@
 <script>
 import db from "@/firebase/init";
 import slugify from "slugify";
+import firebase from "firebase";
+
 export default {
   name: "Index",
   data() {
@@ -89,133 +167,149 @@ export default {
       text: null,
       feedback: null,
       slug: null,
-      search: ''
+      search: ""
     };
   },
   methods: {
     showColorBar() {
-      if (this.showColors == true) {
-        this.showColors = false
+      if (this.showColors) {
+        this.showColors = false;
       } else {
-        this.showColors = true
+        this.showColors = true;
       }
     },
     changeColor(color, id) {
-      db.collection('notes').doc(id).update({
-        bg: color
-      }).catch(err => {console.log(err)
-      })
+      db.collection("notes")
+        .doc(id)
+        .update({
+          bg: color
+        })
+        .catch(err => {
+          console.log(err);
+        });
       // update notes array
-      this.notes.forEach((record) => {
-        if (record.id == id) {
-          record.bg = color
+      this.notes.forEach(record => {
+        if (record.id === id) {
+          record.bg = color;
         }
-      })
+      });
     },
     deleteNote(id) {
       // delete doc from firestore
-      db.collection('notes').doc(id).delete()
-      .then(() => {
-        this.notes = this.notes.filter(note => {
-          return note.id != id
-        })
-      })
+      db.collection("notes")
+        .doc(id)
+        .delete()
+        .then(() => {
+          this.notes = this.notes.filter(note => {
+            return note.id !== id;
+          });
+        });
     },
     addNote() {
       // title check
       if (this.title && this.text) {
-        this.feedback = null
+        this.feedback = null;
         this.slug = slugify(this.title, {
-          replacement: '-',
+          replacement: "-",
           remove: /[$*_+~.()'"!-:@]/g,
           lower: true
-        })
-        db.collection('notes').add({
-          title: this.title,
-          text: this.text,
-          slug: this.slug,
-          bg: '#f8f8f8',
-          dateCreated: Date()
-        }).catch(err => {console.log(err)})
-        this.note
+        });
+        db.collection("notes")
+          .add({
+            title: this.title,
+            text: this.text,
+            slug: this.slug,
+            bg: "#f8f8f8",
+            dateCreated: Date()
+          })
+          .catch(err => {
+            console.log(err);
+          });
         // re-read data from firestore
         this.note = {
           title: this.title,
           text: this.text,
           slug: this.slug,
-          bg: '#f8f8f8'
-        }
-        this.notes.unshift(this.note)
-        this.showModal = false
-        this.title = null
-        this.text = null
-        this.slug = null
-      } else if (this.title && !(this.text)) {
-        this.feedback = 'You must enter some text.'
+          bg: "#f8f8f8"
+        };
+        this.notes.unshift(this.note);
+        this.showModal = false;
+        this.title = null;
+        this.text = null;
+        this.slug = null;
+      } else if (this.title && !this.text) {
+        this.feedback = "You must enter some text.";
       } else {
-        this.feedback = 'You must enter a title.'
+        this.feedback = "You must enter a title.";
       }
     },
     grabData(title) {
-      let ref = db.collection('notes').where('title', '==', title)
+      let ref = db.collection("notes").where("title", "==", title);
       ref.get().then(snapshot => {
         snapshot.forEach(doc => {
-          this.note = doc.data()
-          this.note.id = doc.id
-          this.showEdit = "true"
-        })
-      })
+          this.note = doc.data();
+          this.note.id = doc.id;
+          this.showEdit = "true";
+        });
+      });
     },
     editNote() {
       if (this.note.title && this.note.text) {
-        this.feedback = null
+        this.feedback = null;
         this.note.slug = slugify(this.note.title, {
-          replacement: '-',
+          replacement: "-",
           remove: /[$*_+~.()'"!-:@]/g,
           lower: true
-        })
-        db.collection('notes').doc(this.note.id).update({
-          title: this.note.title,
-          text: this.note.text,
-          slug: this.note.slug
-        }).catch(err => {console.log(err)})
+        });
+        db.collection("notes")
+          .doc(this.note.id)
+          .update({
+            title: this.note.title,
+            text: this.note.text,
+            slug: this.note.slug
+          })
+          .catch(err => {
+            console.log(err);
+          });
         // edit notes array
-        this.notes.forEach((record) => {
-          if (record.id == this.note.id) {
-            record.title = this.note.title
-            record.text = this.note.text
-            record.slug = this.note.slug
+        this.notes.forEach(record => {
+          if (record.id === this.note.id) {
+            record.title = this.note.title;
+            record.text = this.note.text;
+            record.slug = this.note.slug;
           }
-        })
-        this.showEdit = false
-      } else if (this.note.title && !(this.note.text)) {
-        this.feedback = 'You must enter some text.'
+        });
+        this.showEdit = false;
+      } else if (this.note.title && !this.note.text) {
+        this.feedback = "You must enter some text.";
       } else {
-        this.feedback = 'You must enter a title.'
+        this.feedback = "You must enter a title.";
       }
     }
   },
   computed: {
     filteredList() {
       return this.notes.filter(item => {
-        return item.title.toLowerCase().includes(this.search.toLowerCase())
-      })
+        return item.title.toLowerCase().includes(this.search.toLowerCase());
+      });
     }
   },
-  created() {
+  mounted() {
+    console.log(firebase.auth().currentUser);
     // get data from firestore
-    db.collection("notes").orderBy("dateCreated").get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          let note = doc.data()
-          note.id = doc.id
-          this.notes.push(note)
+    db.collection("notes")
+      .orderBy("dateCreated")
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          let note = doc.data();
+          note.id = doc.id;
+          this.notes.push(note);
         });
-        this.notes.reverse()
+        this.notes.reverse();
       });
-  },
+  }
 };
-
 </script>
 
 <style scoped lang="scss">
@@ -298,7 +392,7 @@ export default {
 
 .pop-enter-active,
 .pop-leave-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .pop-enter,
@@ -337,7 +431,7 @@ export default {
       border: 2px solid #747474;
     }
     h2 {
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: "Noto Sans JP", sans-serif;
       font-weight: 500;
       font-size: 1.2rem;
       margin-bottom: 10px;
@@ -367,7 +461,7 @@ export default {
         color: #f8f8f8;
       }
       .red-ico {
-        color: #f28b82
+        color: #f28b82;
       }
       .yellow-ico {
         color: #fff475;
