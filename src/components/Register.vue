@@ -43,7 +43,7 @@ export default {
           lower: true
         });
         let ref = db.collection("users").doc(this.slug);
-        // let refNote = db.collection("users").doc()
+        let noteRef = db.collection("users").doc(this.slug).collection("notes")
         ref.get().then(doc => {
           if (doc.exists) {
             this.feedback = "This username already exists.";
@@ -55,17 +55,23 @@ export default {
                 ref.set({
                   username: this.username,
                   user_id: cred.user.uid,
+                  slug: this.slug
                 });
-
+                noteRef.add({
+                  title: "Welcome to Notes!",
+                  text: "This is your first note in Notes Web App",
+                  slug: "welcome-to-notes",
+                  bg: "#f8f8f8",
+                  dateCreated: Date()
+                })
               })
               .then(() => {
-                this.$router.push({ name: "Index" });
+                this.$router.push({ name: "Index", params: { username: this.slug} });
               })
               .catch(err => {
                 console.log(err);
                 this.feedback = err.message;
               });
-            this.feedback = "This username is free to use.";
           }
         });
       } else {

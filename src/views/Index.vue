@@ -87,7 +87,7 @@
     <div class="card-section">
       <div
         class="note-card"
-        v-for="item in filteredList"
+        v-for="item in altNotes"
         :key="item.id"
         v-bind:style="{ backgroundColor: item.bg }"
       >
@@ -159,6 +159,8 @@ export default {
   data() {
     return {
       notes: [],
+      altNotes: [],
+      updatedNotes: [],
       note: null,
       showColors: false,
       showModal: false,
@@ -179,7 +181,9 @@ export default {
       }
     },
     changeColor(color, id) {
-      db.collection("notes")
+      db.collection("users")
+        .doc(this.$route.params.username)
+        .collection("notes")
         .doc(id)
         .update({
           bg: color
@@ -196,7 +200,9 @@ export default {
     },
     deleteNote(id) {
       // delete doc from firestore
-      db.collection("notes")
+      db.collection("users")
+        .doc(this.$route.params.username)
+        .collection("notes")
         .doc(id)
         .delete()
         .then(() => {
@@ -214,7 +220,9 @@ export default {
           remove: /[$*_+~.()'"!-:@]/g,
           lower: true
         });
-        db.collection("notes")
+        db.collection("users")
+          .doc(this.$route.params.username)
+          .collection("notes")
           .add({
             title: this.title,
             text: this.text,
@@ -225,7 +233,7 @@ export default {
           .catch(err => {
             console.log(err);
           });
-        // re-read data from firestore
+        // update notes array
         this.note = {
           title: this.title,
           text: this.text,
@@ -244,7 +252,11 @@ export default {
       }
     },
     grabData(title) {
-      let ref = db.collection("notes").where("title", "==", title);
+      let ref = db
+        .collection("users")
+        .doc(this.$route.params.username)
+        .collection("notes")
+        .where("title", "==", title);
       ref.get().then(snapshot => {
         snapshot.forEach(doc => {
           this.note = doc.data();
@@ -261,7 +273,9 @@ export default {
           remove: /[$*_+~.()'"!-:@]/g,
           lower: true
         });
-        db.collection("notes")
+        db.collection("users")
+          .doc(this.$route.params.username)
+          .collection("notes")
           .doc(this.note.id)
           .update({
             title: this.note.title,
@@ -297,7 +311,9 @@ export default {
   mounted() {
     console.log(firebase.auth().currentUser);
     // get data from firestore
-    db.collection("notes")
+    db.collection("users")
+      .doc(this.$route.params.username)
+      .collection("notes")
       .orderBy("dateCreated")
       .get()
       .then(snapshot => {
@@ -308,6 +324,22 @@ export default {
         });
         this.notes.reverse();
       });
+
+    db.collection("users")
+        .doc(this.$route.params.username)
+        .collection("notes")
+        .orderBy("dateCreated")
+        .onSnapshot(snapshot => {
+          snapshot.forEach(doc => {
+            let onsnap = doc.data()
+            onsnap.id = doc.id
+            this.updatedNotes.push(onsnap)
+            console.log(onsnap)
+          })
+          this.updatedNotes.reverse()
+          this.altNotes = this.updatedNotes
+          this.updatedNotes = []
+        })
   }
 };
 </script>

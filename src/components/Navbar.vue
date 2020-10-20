@@ -2,8 +2,7 @@
   <div class="navbar">
     <div class="left-navbar"></div>
     <div class="mid-navbar">
-      <router-link :to="{ name: 'Index' }">
-        <!-- todo: redirect na homepage -->
+      <router-link :to="{ name: 'Home' }">
         <img src="@/assets/notes-logo-red.png" alt="notes-logo" />
       </router-link>
     </div>

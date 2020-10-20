@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/index/:username",
     name: "Index",
     component: Index,
     meta: {
@@ -28,7 +28,7 @@ const routes = [
     component: Login
   },
   {
-    path: "/home",
+    path: "/",
     name: "Home",
     component: Home
   }

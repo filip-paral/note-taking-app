@@ -15,6 +15,7 @@
 
 <script>
 import firebase from "firebase";
+import db from "@/firebase/init";
 
 export default {
   name: "Login",
@@ -22,7 +23,8 @@ export default {
     return {
       email: null,
       password: null,
-      feedback: null
+      feedback: null,
+      slug: null
     };
   },
   methods: {
@@ -31,8 +33,14 @@ export default {
         this.feedback = null;
         firebase.auth().signInWithEmailAndPassword(this.email, this.password)
         .then(cred =>{
-          console.log(cred.user)
-          this.$router.push({ name: "Index" })
+          console.log("This is UID"+cred.user.uid)
+          let ref = db.collection("users").where("user_id", "==", cred.user.uid);
+          ref.get().then(snapshot => {
+            snapshot.forEach(doc => {
+              this.slug = doc.data().slug
+              this.$router.push({ name: "Index", params: { username: this.slug} });
+            })
+          })
         }).catch(err => {
           this.feedback = err.message
         })

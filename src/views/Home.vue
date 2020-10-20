@@ -7,7 +7,9 @@
       <router-link :to="{ name: 'Register' }">
         <button>SIGN UP</button>
       </router-link>
-      <a href="#"><p>Already have an account? Log in!</p></a> <!--TODO: Add router link-->
+      <router-link :to="{ name: 'Login' }">
+        <a href="#"><p>Already have an account? Log in!</p></a>
+      </router-link>
       <img src="@/assets/hero-device.png" alt="hero-image">
     </section>
 
