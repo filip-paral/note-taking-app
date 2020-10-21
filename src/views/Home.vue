@@ -250,6 +250,7 @@ export default {
     margin-bottom: 2rem;
     @media screen and (max-width: 768px) {
       grid-template-columns: 1fr 1fr;
+      gap: 20px
     }
     .feature-item {
       text-align: left;

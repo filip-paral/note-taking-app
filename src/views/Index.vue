@@ -396,14 +396,20 @@ export default {
 .modal {
   position: fixed;
   top: 50vh;
-  left: 50%;
-  transform: translate(-50%, -110%);
+  left: 50vw;
+  transform: translate(-50%, -50%);
   z-index: 100;
   width: 100%;
   max-width: 500px;
   background: #ffffff;
   border-radius: 10px;
   padding: 16px;
+  @media screen and (max-width: 768px) {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+  }
 }
 
 // CARDS
