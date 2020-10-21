@@ -395,9 +395,8 @@ export default {
 
 .modal {
   position: fixed;
-  top: 50vh;
-  left: 50vw;
-  transform: translate(-50%, -50%);
+  top: 250px;
+  left: 30%;
   z-index: 100;
   width: 100%;
   max-width: 500px;
@@ -405,10 +404,11 @@ export default {
   border-radius: 10px;
   padding: 16px;
   @media screen and (max-width: 768px) {
-    width: 100vw;
-    height: 100vh;
-    top: 0;
-    left: 0;
+    max-width: 90vw;
+    width: 90vw;
+    height: 80vh;
+    top: 5vh;
+    left: 5vw;
   }
 }
 
@@ -534,9 +534,14 @@ input {
   resize: none;
   border: none;
   margin-bottom: 2.5rem;
+  height: 100%;
   &:focus {
     outline: none;
   }
+}
+
+form {
+  height: 100%;
 }
 
 .submit-btn {
@@ -555,6 +560,10 @@ input {
   color: red;
   font-size: 0.8rem;
   font-family: "Roboto", sans-serif;
+}
+
+.add-note-txt {
+  height: 80%;
 }
 
 .field {
