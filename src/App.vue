@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&family=Noto+Sans+JP:wght@100;300;400;500;700;900&family=Ubuntu:wght@300;400;500;700&family=Roboto:wght@100;300;400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&family=Noto+Sans+JP:wght@100;300;400;500;700;900&family=Ubuntu:wght@300;400;500;700&family=Roboto:wght@100;300;400;500;700;900&display=swap");
 
 html {
   -webkit-box-sizing: border-box;

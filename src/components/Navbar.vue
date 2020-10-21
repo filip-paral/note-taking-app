@@ -1,6 +1,5 @@
 <template>
   <div class="navbar">
-    <div class="left-navbar"></div>
     <div class="mid-navbar">
       <router-link :to="{ name: 'Home' }">
         <img src="@/assets/notes-logo-red.png" alt="notes-logo" />
@@ -10,7 +9,9 @@
       <router-link :to="{ name: 'Login' }">
         <div v-if="!user" class="login-btn">Login</div>
       </router-link>
-      <p v-if="user">{{ user.email }}</p>
+      <router-link :to="{ name: 'Index', params: { username: this.slug } }">
+        <p v-if="user"><i class="user-icon far fa-2x fa-user"></i></p>
+      </router-link>
       <div v-if="user" @click="logout" class="logout-btn">Logout</div>
       <router-link :to="{ name: 'Register' }">
         <div v-if="!user" class="register-btn">Register</div>
@@ -21,12 +22,14 @@
 
 <script>
 import firebase from "firebase";
+import db from "@/firebase/init"
 
 export default {
   name: "Navbar",
   data() {
     return {
-      user: null
+      user: null,
+      slug: null
     };
   },
   methods: {
@@ -36,14 +39,21 @@ export default {
         .signOut()
         .then(() => {
           this.$router.push({ name: "Home" });
+          this.slug = null;
         });
     }
   },
   created() {
-    // let user = firebase.auth().currentUser
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user;
+        db.collection("users")
+            .where("user_id", "==", user.uid)
+            .get().then(snapshot => {
+          snapshot.forEach(doc => {
+            this.slug = doc.data().slug
+          })
+        })
       } else {
         this.user = null;
       }
@@ -65,26 +75,28 @@ export default {
     display: flex;
     align-items: center;
   }
-  .left-navbar {
-    flex-basis: 30%;
-  }
+  //.left-navbar {
+  //  flex-basis: 10%;
+  //}
   .mid-navbar {
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    flex-basis: 65%;
     img {
-      height: 60px;
+      height: 50px;
     }
     a {
       text-decoration: none;
       display: flex;
       align-items: center;
+      padding: 0.6rem;
     }
   }
   .right-navbar {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    flex-basis: 30%;
+    flex-basis: 25%;
     a {
       text-decoration: none;
     }
@@ -126,5 +138,10 @@ export default {
       letter-spacing: 1px;
     }
   }
+}
+
+.user-icon {
+  color: #eb5160;
+  margin-right: 1rem;
 }
 </style>

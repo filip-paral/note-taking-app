@@ -87,7 +87,7 @@
     <div class="card-section">
       <div
         class="note-card"
-        v-for="item in altNotes"
+        v-for="item in filteredList"
         :key="item.id"
         v-bind:style="{ backgroundColor: item.bg }"
       >
@@ -191,12 +191,6 @@ export default {
         .catch(err => {
           console.log(err);
         });
-      // update notes array
-      this.notes.forEach(record => {
-        if (record.id === id) {
-          record.bg = color;
-        }
-      });
     },
     deleteNote(id) {
       // delete doc from firestore
@@ -204,12 +198,7 @@ export default {
         .doc(this.$route.params.username)
         .collection("notes")
         .doc(id)
-        .delete()
-        .then(() => {
-          this.notes = this.notes.filter(note => {
-            return note.id !== id;
-          });
-        });
+        .delete();
     },
     addNote() {
       // title check
@@ -233,14 +222,6 @@ export default {
           .catch(err => {
             console.log(err);
           });
-        // update notes array
-        this.note = {
-          title: this.title,
-          text: this.text,
-          slug: this.slug,
-          bg: "#f8f8f8"
-        };
-        this.notes.unshift(this.note);
         this.showModal = false;
         this.title = null;
         this.text = null;
@@ -285,14 +266,6 @@ export default {
           .catch(err => {
             console.log(err);
           });
-        // edit notes array
-        this.notes.forEach(record => {
-          if (record.id === this.note.id) {
-            record.title = this.note.title;
-            record.text = this.note.text;
-            record.slug = this.note.slug;
-          }
-        });
         this.showEdit = false;
       } else if (this.note.title && !this.note.text) {
         this.feedback = "You must enter some text.";
@@ -310,36 +283,20 @@ export default {
   },
   mounted() {
     console.log(firebase.auth().currentUser);
-    // get data from firestore
     db.collection("users")
       .doc(this.$route.params.username)
       .collection("notes")
       .orderBy("dateCreated")
-      .get()
-      .then(snapshot => {
+      .onSnapshot(snapshot => {
         snapshot.forEach(doc => {
-          let note = doc.data();
-          note.id = doc.id;
-          this.notes.push(note);
+          let onsnap = doc.data();
+          onsnap.id = doc.id;
+          this.updatedNotes.push(onsnap);
         });
-        this.notes.reverse();
+        this.updatedNotes.reverse();
+        this.notes = this.updatedNotes;
+        this.updatedNotes = [];
       });
-
-    db.collection("users")
-        .doc(this.$route.params.username)
-        .collection("notes")
-        .orderBy("dateCreated")
-        .onSnapshot(snapshot => {
-          snapshot.forEach(doc => {
-            let onsnap = doc.data()
-            onsnap.id = doc.id
-            this.updatedNotes.push(onsnap)
-            console.log(onsnap)
-          })
-          this.updatedNotes.reverse()
-          this.altNotes = this.updatedNotes
-          this.updatedNotes = []
-        })
   }
 };
 </script>
@@ -371,6 +328,9 @@ export default {
       font-size: 1.2rem;
       background-color: #f1f3f4;
       border: none;
+      @media screen and (max-width: 768px) {
+        width: 80%;
+      }
     }
     .search-icon {
       margin-right: 20px;
@@ -385,7 +345,7 @@ export default {
   border-radius: 100%;
   border: none;
   text-decoration: none;
-  background-color: #ff6600;
+  background-color: #eb5160;
   width: 70px;
   height: 70px;
   position: fixed;
@@ -452,6 +412,12 @@ export default {
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 12px;
   margin: 2vw 3vw;
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  @media screen and (max-width: 450px) {
+    grid-template-columns: 1fr;
+  }
   .note-card {
     background-color: #f8f8f8;
     padding: 5% 5% 15% 5%;
@@ -539,10 +505,6 @@ export default {
   }
 }
 
-//.color-icon:hover .color-picker{
-//  opacity: 1;
-//}
-
 //FORM
 input {
   width: 100%;
@@ -575,11 +537,12 @@ input {
   cursor: pointer;
   border: none;
   font-size: 1rem;
-  font-family: "Roboto", sans-serif;
+  font-family: "Helvetica Neue", "Helvetica", sans-serif;
   font-weight: 400;
   position: absolute;
   right: 10px;
   bottom: 10px;
+  background: #ffffff;
 }
 
 .red-txt {
@@ -590,6 +553,5 @@ input {
 
 .field {
   position: relative;
-  background: #ffffff;
 }
 </style>
