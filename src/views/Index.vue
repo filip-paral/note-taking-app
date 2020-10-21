@@ -395,7 +395,7 @@ export default {
 
 .modal {
   position: fixed;
-  top: 50%;
+  top: 50vh;
   left: 50%;
   transform: translate(-50%, -110%);
   z-index: 100;
@@ -538,7 +538,7 @@ input {
   border: none;
   font-size: 1rem;
   font-family: "Helvetica Neue", "Helvetica", sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   position: absolute;
   right: 10px;
   bottom: 10px;
